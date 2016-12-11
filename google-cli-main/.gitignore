@@ -1,0 +1,11 @@
+/.idea
+/*.iml
+
+/.project
+/.classpath
+/.cache
+/.settings
+
+/target
+
+/src/main/resources/application.conf
