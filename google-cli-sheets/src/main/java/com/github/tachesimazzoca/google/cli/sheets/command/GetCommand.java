@@ -9,7 +9,10 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
+import java.io.Closeable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +20,7 @@ public class GetCommand implements Command {
 
     private static final String APPLICATION_NAME = GetCommand.class.getName();
     private static final List<String> SCOPES = Arrays.asList(SheetsScopes.SPREADSHEETS_READONLY);
+    private static final CSVFormat CSV_FORMAT = CSVFormat.DEFAULT.withDelimiter('\t');
 
     @Override
     public String getArgumentSyntax() {
@@ -39,7 +43,10 @@ public class GetCommand implements Command {
         String sheetId = args[0];
         String query = args[1];
 
+        CSVPrinter printer = null;
         try {
+            printer = CSV_FORMAT.print(System.out);
+
             String userId = request.getUserId();
             Authorizer authorizer = new Authorizer(environment, new LocalServerReceiverProvider());
             Credential credential = authorizer.authorize(userId, SCOPES);
@@ -55,32 +62,24 @@ public class GetCommand implements Command {
             List<List<Object>> rows = valueRange.getValues();
             if (null != rows) {
                 for (List<Object> columns : rows) {
-                    System.out.println(formatLine(columns, "\t"));
+                    printer.printRecord(columns);
                 }
             }
 
         } catch (Throwable e) {
             throw new Error(e);
+        } finally {
+            closeQuietly(printer);
         }
     }
 
-    private static String formatLine(List<Object> items, String separator) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < items.size(); i++) {
-            Object v = items.get(i);
-            if (i > 0) {
-                sb.append(separator);
-            }
-            if (null == v) {
-                sb.append("");
-            } else {
-                String s = v.toString()
-                        .replace("\t", "")
-                        .replace("\r", "")
-                        .replace("\n", "");
-                sb.append(s);
+    private static void closeQuietly(Closeable o) {
+        if (null != o) {
+            try {
+                o.close();
+            } catch (Exception e) {
+                // Fail gracefully
             }
         }
-        return sb.toString();
     }
 }
