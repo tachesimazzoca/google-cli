@@ -6,7 +6,7 @@ Make sure you already have a Google API project and a client ID. You are not fam
 
 * https://developers.google.com/identity/protocols/OAuth2
 
-The skelton file `skel/resources/application.conf` is prepared for your configuration file, written in [Typesafe Config](https://typesafehub.github.io/config/) HOCON format.
+The skelton file `google-cli-main/skel/resources/application.conf` is prepared for your configuration file, written in [Typesafe Config](https://typesafehub.github.io/config/) HOCON format.
 
     GoogleAPI {
       # The path to your client ID file downloaded from Google API console
@@ -15,4 +15,4 @@ The skelton file `skel/resources/application.conf` is prepared for your configur
       dataStoreDirectoryPath: "/path/to/google/data/dir"
     }
 
-Copy this skelton file into the Java class path `/application.conf`, and replace those values with yours.
+Copy this skelton file into `~/.google-cli/application.conf`, and replace those values with yours.
