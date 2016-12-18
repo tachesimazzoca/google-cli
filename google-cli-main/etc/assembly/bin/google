@@ -1,0 +1,27 @@
+#!/bin/sh
+
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+PRGDIR=`dirname "$PRG"`
+
+# Set PGM_HOME to the parent directory of $PRGDIR
+PRG_HOME=$(cd "$PRGDIR/.." >/dev/null; pwd)
+
+CLASSPATH="."
+for f in `ls ${PRG_HOME}/lib/*`
+do
+  CLASSPATH="${CLASSPATH}:${f}"
+done
+
+java -cp "${CLASSPATH}" -Dconfig.file="${HOME}/.google-cli/application.conf" com.github.tachesimazzoca.google.cli.Main "$@"
+
